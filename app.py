@@ -62,10 +62,21 @@ jobs = {}
 
 def get_info(url):
     ydl_opts = {
-        "quiet": True, 
-        "no_warnings": True, 
+        "quiet": True,
+        "no_warnings": True,
         "skip_download": True,
-        "format": "bestvideo+bestaudio/best" if HAS_FFMPEG else "best"
+        "nocheckcertificate": True,
+        "format": "bestvideo+bestaudio/best" if HAS_FFMPEG else "best",
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["tv_embedded", "ios", "web"],
+                "player_skip": ["webpage", "configs"],
+            }
+        },
+        "http_headers": {
+            "User-Agent": "com.google.ios.youtube/19.29.1 (iPhone16,2; U; CPU iOS 17_5_1 like Mac OS X)",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
     }
     if FFMPEG_DIR:
         ydl_opts["ffmpeg_location"] = FFMPEG_DIR
@@ -176,24 +187,26 @@ def run_download(job_id, url, fmt_id, is_audio, audio_codec="mp3"):
             "progress_hooks": [progress_hook],
             "quiet": True,
             "no_warnings": True,
-            "restrictfilenames": True, # High-safety for Windows renames
+            "restrictfilenames": True,
             "windowsfilenames": True,
             "noprogress": True,
-            "writethumbnail": True, # Embed thumbnail into audio
-            "nocheckcertificate": True, # Fix network connectivity
+            "writethumbnail": True,
+            "nocheckcertificate": True,
             "prefer_ffmpeg": True,
             "socket_timeout": 60,
             "retries": 10,
             "cachedir": False,
             "noplaylist": True,
-            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "http_headers": {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-us,en;q=0.5",
-                "Sec-Fetch-Mode": "navigate",
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["tv_embedded", "ios", "web"],
+                    "player_skip": ["webpage", "configs"],
+                }
             },
-            # Removed cookiesfrombrowser to avoid file locking on Windows
+            "http_headers": {
+                "User-Agent": "com.google.ios.youtube/19.29.1 (iPhone16,2; U; CPU iOS 17_5_1 like Mac OS X)",
+                "Accept-Language": "en-US,en;q=0.9",
+            },
         }
 
         if FFMPEG_DIR:
