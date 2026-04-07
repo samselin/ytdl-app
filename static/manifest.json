@@ -1,0 +1,22 @@
+{
+  "name": "YTDL — Premium Downloader",
+  "short_name": "YTDL",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0ebe1",
+  "theme_color": "#007a6e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/static/images/app_icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/images/app_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

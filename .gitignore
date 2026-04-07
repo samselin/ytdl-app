@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+# Flask
+.env
+instance/
+.pytest_cache/
+
+# App Specific
+static/downloads/*
+!static/downloads/.gitkeep
+*.temp
+*.part
+*.ytdl
+*.log
+ffmpeg_path.txt
+yt_dlp_formats.txt
+
+# OS
+.DS_Store
+Thumbs.db
