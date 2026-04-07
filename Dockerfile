@@ -20,5 +20,4 @@ RUN mkdir -p static/downloads
 
 # Expose port and run the app
 EXPOSE 7860
-ENV FLASK_APP=app.py
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:7860", "--timeout", "120", "--workers", "2", "app:app"]

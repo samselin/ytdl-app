@@ -367,7 +367,19 @@ def serve_file(job_id):
     filepath = os.path.join(DOWNLOAD_DIR, filename)
     
     display_name = filename.split("_", 1)[-1] if "_" in filename else filename
-    return send_file(filepath, as_attachment=True, download_name=display_name)
+    response = send_file(filepath, as_attachment=True, download_name=display_name)
+    
+    @response.call_on_close
+    def remove_file():
+        try:
+            # Short wait for file handle release on Windows
+            time.sleep(1)
+            os.remove(filepath)
+            print(f"🗑️ Cleaned up downloaded file: {filename}")
+        except Exception as e:
+            print(f"Cleanup skip for {filename}: {e}")
+            
+    return response
 
 @app.route("/status")
 def status():
@@ -379,30 +391,30 @@ def status():
 
 # --- Background Cleanup Thread ---
 def cleanup_thread():
-    """Delete files older than 1 hour every 30 minutes."""
+    """Delete old files every 10 minutes (files older than 20 min)."""
     while True:
         try:
             now = time.time()
-            for f in os.listdir(DOWNLOAD_DIR):
-                path = os.path.join(DOWNLOAD_DIR, f)
-                # Only touch files NOT modified in the last 10 minutes (safety guard)
-                if os.path.isfile(path):
-                    mtime = os.path.getmtime(path)
-                    if now - mtime > 3600: # Older than 1 hour
-                        try:
-                            os.remove(path)
-                            print(f"🧹 Cleaned up old file: {f}")
-                        except:
-                            pass # Still locked, skip it this time
+            if os.path.exists(DOWNLOAD_DIR):
+                for f in os.listdir(DOWNLOAD_DIR):
+                    path = os.path.join(DOWNLOAD_DIR, f)
+                    if os.path.isfile(path):
+                        mtime = os.path.getmtime(path)
+                        # Remove if older than 20 minutes
+                        if now - mtime > 1200: 
+                            try:
+                                os.remove(path)
+                                print(f"🧹 GC: Removed old file {f}")
+                            except:
+                                pass
         except Exception as e:
             print(f"Cleanup error: {e}")
-        time.sleep(1800)
+        time.sleep(600)
 
 if __name__ == "__main__":
-    # Start cleanup in background (Disabled temporarily to fix WinError 32)
-    # t = threading.Thread(target=cleanup_thread, daemon=True)
-    # t.start()
+    t = threading.Thread(target=cleanup_thread, daemon=True)
+    t.start()
     
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 7860))
     print(f"\n🎬 YTDL online at http://localhost:{port}\n")
     app.run(host="0.0.0.0", port=port, debug=True)
