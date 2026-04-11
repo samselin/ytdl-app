@@ -262,13 +262,13 @@ def run_download(job_id, url, fmt_id, is_audio, audio_codec="mp3"):
                 if str(fmt_id).startswith("res_"):
                     # Use resolution targeting (the most robust way)
                     h = fmt_id.split("_")[1]
-                    # We use bestvideo[height<=H] to get the best one for that resolution
-                    fmt_str = f"bestvideo[height<={h}]+bestaudio/best"
+                    # Added fallbacks using '/' to prevent "format not available" errors
+                    fmt_str = f"bestvideo[height<={h}]+bestaudio/bestvideo+bestaudio/best"
                 elif "bestvideo" in str(fmt_id):
-                    fmt_str = str(fmt_id)
+                    fmt_str = f"{fmt_id}/bestvideo+bestaudio/best"
                 elif str(fmt_id).isdigit():
-                    # Pin to ID + best audio
-                    fmt_str = f"{fmt_id}+bestaudio/best"
+                    # Fallback to general best if the specific ID is missing
+                    fmt_str = f"{fmt_id}+bestaudio/bestvideo+bestaudio/best"
                 else:
                     fmt_str = "bestvideo+bestaudio/best"
             except:
