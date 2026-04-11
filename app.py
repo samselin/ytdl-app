@@ -19,7 +19,11 @@ def find_ffmpeg():
     """Search for ffmpeg.exe in PATH and common Windows install locations."""
     # 1. Check PATH first
     found = shutil.which("ffmpeg")
-    if found:
+    if found and os.name != 'nt':
+        # On Linux/PaaS, if it's in PATH, just return the path to the executable's dir
+        return os.path.dirname(os.path.abspath(found))
+    
+    if found and os.name == 'nt':
         return os.path.dirname(os.path.abspath(found))
 
     # 2. Search common Windows install directories
@@ -60,12 +64,23 @@ else:
 # Status can be: 'pending', 'downloading', 'done', 'error'
 jobs = {}
 
+def get_ydl_cookies():
+    """Check for a local cookies.txt file for cloud environments."""
+    cookie_path = os.path.join(os.path.dirname(__file__), "cookies.txt")
+    if os.path.exists(cookie_path):
+        return {"cookiefile": cookie_path}
+    # Fallback to browser only if on Windows/Local
+    if os.name == 'nt':
+        return {"cookiesfrombrowser": ("edge",)}
+    return {}
+
 def get_info(url):
     ydl_opts = {
         "quiet": True,
         "no_warnings": True,
         "skip_download": True,
         "nocheckcertificate": True,
+        **get_ydl_cookies(),
         "format": "bestvideo+bestaudio/best" if HAS_FFMPEG else "best",
         "extractor_args": {
             "youtube": {
@@ -197,6 +212,7 @@ def run_download(job_id, url, fmt_id, is_audio, audio_codec="mp3"):
             "retries": 10,
             "cachedir": False,
             "noplaylist": True,
+            **get_ydl_cookies(),
             "extractor_args": {
                 "youtube": {
                     "player_client": ["tv_embedded", "ios", "web"],

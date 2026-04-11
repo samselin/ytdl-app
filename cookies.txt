@@ -1,0 +1,8 @@
+# Netscape HTTP Cookie File
+# This file allows yt-dlp to use your session to bypass bot detection.
+# Paste your exported YouTube cookies below this line.
+# Netscape HTTP Cookie File
+# https://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file! Do not edit.# Netscape HTTP Cookie File
+# https://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file! Do not edit.

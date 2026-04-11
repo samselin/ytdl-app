@@ -20,4 +20,4 @@ RUN mkdir -p static/downloads
 
 # Expose port and run the app
 EXPOSE 7860
-CMD ["gunicorn", "-b", "0.0.0.0:7860", "--timeout", "120", "--workers", "2", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:7860", "--timeout", "600", "--workers", "1", "app:app"]
